@@ -1,0 +1,16 @@
+{
+  "name": "starforge-echoes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vite": "^5.0.12",
+    "vitest": "^1.2.2"
+  }
+}
