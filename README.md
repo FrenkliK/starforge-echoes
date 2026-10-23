@@ -22,6 +22,10 @@ npm run preview
 
 The game runs locally in the browser. It has no runtime server or account requirement. Audio is synthesized by the browser and starts after your first interaction.
 
+## Play online
+
+The site is configured for GitHub Pages at <https://frenklik.github.io/starforge-echoes/>. Once Pages is enabled for the repository, each push to `main` runs the tests, builds the site, and deploys the `dist` folder.
+
 ## Controls
 
 | Action | Default key |
