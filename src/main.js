@@ -13,6 +13,7 @@ const runStatus = byId("run-status");
 const statusDot = byId("status-dot");
 const pauseBtn = byId("pause-btn");
 const restartBtn = byId("restart-btn");
+const fullscreenBtn = byId("fullscreen-btn");
 const overlay = byId("overlay");
 const overlayTitle = byId("overlay-title");
 const overlayBody = byId("overlay-body");
@@ -336,6 +337,18 @@ const setupUi = () => {
     hideOverlay();
   });
   overlayNext.addEventListener("click", () => advanceSector());
+
+  fullscreenBtn.addEventListener("click", async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    } catch {
+      showOverlay("Full screen unavailable", "Use the Open full game link in the portfolio to play in its own tab.");
+    }
+  });
+  document.addEventListener("fullscreenchange", () => {
+    fullscreenBtn.textContent = document.fullscreenElement ? "Exit full screen" : "Full screen";
+  });
 
   restartBtn.addEventListener("click", () => {
     resetReplayState();
