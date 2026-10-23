@@ -19,13 +19,19 @@ export const GAME_CONFIG = {
   enemy: {
     speed: 2.6,
     maxHealth: 40,
-    damage: 15
+    damage: 6,
+    contactCooldown: 1.0
   }
 };
 
-export const createGameState = ({ seed }) => {
+export const requiredPickupsForLevel = (level) => level.pickupSpawns.length === 0
+  ? 0
+  : Math.max(1, Math.ceil(level.pickupSpawns.length * 0.6));
+
+export const createGameState = ({ seed, sector = 1 }) => {
+  const sectorSeed = `${seed}:sector:${sector}`;
   const level = generateLevel({
-    seed,
+    seed: sectorSeed,
     width: GAME_CONFIG.width,
     height: GAME_CONFIG.height,
     roomCount: GAME_CONFIG.roomCount
@@ -39,6 +45,7 @@ export const createGameState = ({ seed }) => {
   world.components.health.set(player, { hp: GAME_CONFIG.player.maxHealth, max: GAME_CONFIG.player.maxHealth });
   world.components.player.set(player, {
     attackCooldown: 0,
+    damageCooldown: 2.5,
     facing: { x: 1, y: 0 }
   });
   world.components.collider.set(player, { radius: 0.45 });
@@ -67,6 +74,7 @@ export const createGameState = ({ seed }) => {
 
   return {
     seed,
+    sector,
     world,
     level,
     tick: 0,
@@ -128,6 +136,9 @@ export const stepSimulation = (state, input, dt, rng) => {
   if (playerStats.attackCooldown > 0) {
     playerStats.attackCooldown -= dt;
   }
+  if (playerStats.damageCooldown > 0) {
+    playerStats.damageCooldown -= dt;
+  }
 
   if (input.attack && playerStats.attackCooldown <= 0) {
     playerStats.attackCooldown = GAME_CONFIG.player.attackCooldown;
@@ -187,15 +198,16 @@ export const stepSimulation = (state, input, dt, rng) => {
   for (const [id, ai] of world.components.ai) {
     const pos = world.components.position.get(id);
     const dist = Math.hypot(pos.x - playerPos.x, pos.y - playerPos.y);
-    if (dist < 0.8 && playerHealth.hp > 0) {
-      playerHealth.hp -= GAME_CONFIG.enemy.damage * dt;
+    if (dist < 0.8 && playerHealth.hp > 0 && playerStats.damageCooldown <= 0) {
+      playerHealth.hp -= GAME_CONFIG.enemy.damage;
+      playerStats.damageCooldown = GAME_CONFIG.enemy.contactCooldown;
       events.push({ type: "damage", target: playerId });
     }
     const health = world.components.health.get(id);
     if (health && health.hp <= 0) {
       removeEntity(world, id);
       state.score += 20;
-      events.push({ type: "enemy-down", target: id });
+      events.push({ type: "enemy-down", target: id, position: { ...pos } });
     }
   }
 
@@ -206,14 +218,14 @@ export const stepSimulation = (state, input, dt, rng) => {
       removeEntity(world, id);
       state.pickups += 1;
       state.score += 50;
-      events.push({ type: "pickup", target: id });
+      events.push({ type: "pickup", target: id, position: { ...pos } });
     }
   }
 
   const exitEntry = [...world.components.exit.entries()][0];
   if (exitEntry) {
     const [exitId, exitData] = exitEntry;
-    if (state.pickups >= Math.floor(level.pickupSpawns.length * 0.6)) {
+    if (state.pickups >= requiredPickupsForLevel(level)) {
       exitData.active = true;
     }
     const exitPos = world.components.position.get(exitId);

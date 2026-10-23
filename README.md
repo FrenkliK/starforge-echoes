@@ -1,48 +1,64 @@
 # Starforge Echoes
 
-A single-player, deterministic roguelike about diving into a shattered starforge. Explore procedurally generated sectors, defeat guardians, gather star cores, and escape through the stabilizing portal. The entire experience runs offline in the browser with procedural visuals and synth audio.
+**A deterministic, offline-first browser roguelike.** Descend into a shifting starforge, outmaneuver its guardians, recover enough star cores to open the gate, and carry your score into the next sector.
 
-## Features
-- **Deterministic procedural runs** with a seeded RNG and replayable input log.
-- **Satisfying loop**: explore → fight → collect cores → unlock the exit.
-- **Juice**: particles, responsive controls, animated pickups, and synth audio.
-- **Built-in devtools**: debug overlay, performance HUD, and replay viewer.
+> This is a playable prototype. Its combat, procedural sectors, run controls, seeded generation, and replay tools are implemented. Persistent saves, inventory, and additional enemy types are future work.
 
-## Controls
-- Move: `W` `A` `S` `D`
-- Attack: `Space`
-- Pause: `Escape`
-- Remap controls in the right-hand panel.
+## Play locally
 
-## How to Run
+Requires Node.js 18 or newer.
+
 ```bash
 npm install
 npm run dev
 ```
-Then open the local URL printed by Vite (defaults to `http://localhost:5173`).
 
-## How to Run Tests
+Open the local URL shown by Vite and choose **Begin run**. To build and preview a production bundle:
+
+```bash
+npm run build
+npm run preview
+```
+
+The game runs locally in the browser. It has no runtime server or account requirement. Audio is synthesized by the browser and starts after your first interaction.
+
+## Controls
+
+| Action | Default key |
+| --- | --- |
+| Move | W / A / S / D |
+| Strike | Space |
+| Pause or resume | Escape |
+
+Use **Remap keys** in the run console to change the bindings. Run tools and developer settings are in the side panel.
+
+## Run tools
+
+- Enter any seed to replay the same procedural first sector.
+- Load the daily seed for a shared starting map.
+- Record a run, copy its replay JSON, and paste it into **Replay data** to play it back. Sector changes are included in the replay.
+- Toggle the path grid and live state, or show the performance readout.
+
+The exit activates after you collect the required share of cores in a sector. Reach it to continue with your score and the next deterministic sector.
+
+## Tests
+
 ```bash
 npm test
 ```
 
-## Changing the Seed / Replaying a Run
-- **Change seed:** enter a seed in the “Run Tools” panel and click **Apply Seed** (or use **Seed of the Day**).
-- **Record replay:** click **Start Recording**, play, then click **Stop & Copy** to copy replay JSON.
-- **Replay:** paste JSON into the replay box and click **Play Replay**.
+The Vitest suite covers deterministic generation and simulation, walkable routes, sector objectives, and replay validation.
 
-## Devtools
-- **Debug Overlay:** toggle to see grid, player stats, and live state.
-- **Performance HUD:** FPS + entity count display.
+## Structure
 
-## Dependencies
-- **Vite** — lightweight dev server and bundler for a fast offline dev loop.
-- **Vitest** — fast, Vite-compatible unit tests for deterministic logic.
+```text
+src/core/   Seeded generation, simulation, pathfinding, replay, and audio
+src/ui/     Canvas renderer and keyboard input
+tests/      Core system tests
+```
 
-## Troubleshooting
-- **Blank screen or no audio:** Some browsers block audio until the first interaction. Click the canvas or press a key to unlock audio.
-- **Port already in use:** Run `npm run dev -- --port 5174` to choose a different port.
-- **Replay JSON error:** Ensure the JSON is complete and not truncated when copying.
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for system boundaries and determinism details. The project uses Vite for local development and bundling, and Vitest for tests; neither is required to play a built static bundle.
 
 ## License
-MIT (see LICENSE if added later).
+
+MIT. See [`LICENSE`](LICENSE).

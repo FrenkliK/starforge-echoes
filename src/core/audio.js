@@ -6,6 +6,7 @@ export class AudioBus {
   }
 
   ensure() {
+    if (!window.AudioContext && !window.webkitAudioContext) return null;
     if (!this.context) {
       this.context = createContext();
     }
@@ -14,6 +15,8 @@ export class AudioBus {
 
   playTone({ type = "sine", frequency = 440, duration = 0.15, gain = 0.2 }) {
     const ctx = this.ensure();
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume().catch(() => {});
     const osc = ctx.createOscillator();
     const amp = ctx.createGain();
     osc.type = type;

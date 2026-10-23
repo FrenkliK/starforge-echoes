@@ -4,73 +4,88 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Starforge Echoes</title>
+    <meta name="theme-color" content="#0b101b" />
+    <meta name="description" content="Starforge Echoes is a deterministic, offline-first roguelike. Explore shifting sectors, fight guardians, and carry your run through the ruins." />
+    <meta property="og:title" content="Starforge Echoes" />
+    <meta property="og:description" content="A deterministic, offline-first browser roguelike. Descend into the starforge and carry your score through shifting sectors." />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
     <div id="app">
-      <header class="hud">
-        <div class="hud__left">
-          <h1>Starforge Echoes</h1>
-          <div class="run-info">
-            <span id="seed-label">Seed: --</span>
-            <span id="floor-label">Sector: 1</span>
-          </div>
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Starforge Echoes home">
+          <span class="brand__mark" aria-hidden="true">✦</span>
+          <span><strong>STARFORGE</strong><small>ECHOES</small></span>
+        </a>
+        <div class="run-info" aria-live="polite">
+          <span class="run-info__item"><span id="status-dot" class="status-dot"></span><span id="run-status">RUN IN PROGRESS</span></span>
+          <span class="run-info__item" id="floor-label">Sector 01</span>
+          <span class="run-info__item run-info__seed" id="seed-label">Seed: --</span>
         </div>
-        <div class="hud__right">
-          <button id="pause-btn" class="btn">Pause</button>
-          <button id="restart-btn" class="btn">Restart</button>
+        <div class="topbar__actions">
+          <button id="pause-btn" class="btn btn--quiet" type="button">Pause</button>
+          <button id="restart-btn" class="btn btn--quiet" type="button">Restart run</button>
         </div>
       </header>
       <main class="main">
-        <canvas id="game" width="960" height="600" aria-label="Starforge Echoes game canvas"></canvas>
+        <section class="play-column" aria-label="Game">
+          <div class="section-heading">
+            <div><span class="eyebrow">THE DESCENT</span><h1>Enter the forge</h1></div>
+            <p>Clear a path. Gather cores. Find the exit.</p>
+          </div>
+          <div class="game-frame">
+            <canvas id="game" width="960" height="600" aria-label="Starforge Echoes game canvas" tabindex="0"></canvas>
+            <div class="game-frame__corner game-frame__corner--tl"></div>
+            <div class="game-frame__corner game-frame__corner--tr"></div>
+            <div class="game-frame__corner game-frame__corner--bl"></div>
+            <div class="game-frame__corner game-frame__corner--br"></div>
+          </div>
+          <div class="run-stats" aria-live="polite">
+            <div class="stat-card"><span class="stat-card__label">INTEGRITY</span><div class="health-track"><span id="health-bar"></span></div><strong id="health-label">100 <small>/ 100</small></strong></div>
+            <div class="stat-card"><span class="stat-card__label">STAR CORES</span><strong id="core-label">0 <small>collected</small></strong></div>
+            <div class="stat-card"><span class="stat-card__label">SCORE</span><strong id="score-label">00000</strong></div>
+            <div class="stat-card stat-card--goal"><span class="stat-card__label">SECTOR OBJECTIVE</span><strong id="objective-label">Collect 0 cores to open the gate</strong></div>
+          </div>
+          <footer class="play-footer"><span><kbd>WASD</kbd> MOVE <kbd>SPACE</kbd> STRIKE <kbd>ESC</kbd> PAUSE</span><span>PROCEDURAL RUN <i></i> OFFLINE</span></footer>
+        </section>
         <aside class="panel">
-          <section>
-            <h2>Controls</h2>
-            <ul id="controls-list"></ul>
-            <button id="remap-btn" class="btn">Remap Controls</button>
+          <section class="panel-section panel-section--intro">
+            <span class="eyebrow">RUN CONSOLE</span>
+            <h2>Shape your descent.</h2>
+            <p>Every sector is generated from its seed. Clear the guardians, claim the star cores, and keep moving deeper.</p>
           </section>
-          <section>
-            <h2>Run Tools</h2>
-            <label>
-              Seed
-              <input id="seed-input" type="text" placeholder="Enter seed" />
-            </label>
-            <div class="button-row">
-              <button id="seed-apply" class="btn">Apply Seed</button>
-              <button id="seed-daily" class="btn">Seed of the Day</button>
-            </div>
-            <label>
-              Replay JSON
-              <textarea id="replay-data" rows="5" placeholder="Paste replay data"></textarea>
-            </label>
-            <div class="button-row">
-              <button id="replay-record" class="btn">Start Recording</button>
-              <button id="replay-stop" class="btn">Stop & Copy</button>
-              <button id="replay-play" class="btn">Play Replay</button>
+          <section class="panel-section">
+            <div class="panel-title"><h2>Controls</h2><span class="section-index">01</span></div>
+            <ul id="controls-list" class="controls-list"></ul>
+            <button id="remap-btn" class="btn btn--outline" type="button">Remap keys <span aria-hidden="true">↗</span></button>
+          </section>
+          <section class="panel-section">
+            <div class="panel-title"><h2>Run tools</h2><span class="section-index">02</span></div>
+            <label class="field-label" for="seed-input">World seed</label>
+            <div class="input-action"><input id="seed-input" type="text" placeholder="e.g. 2026-10-23" /><button id="seed-apply" class="btn btn--accent" type="button">Apply</button></div>
+            <button id="seed-daily" class="btn btn--text" type="button">Load daily seed <span aria-hidden="true">→</span></button>
+            <label class="field-label" for="replay-data">Replay data</label>
+            <textarea id="replay-data" rows="4" placeholder="Paste a replay JSON export"></textarea>
+            <div class="button-row button-row--compact">
+              <button id="replay-record" class="btn btn--outline" type="button">Record</button>
+              <button id="replay-stop" class="btn btn--outline" type="button" disabled>Stop &amp; copy</button>
+              <button id="replay-play" class="btn btn--outline" type="button">Play replay</button>
             </div>
           </section>
-          <section>
-            <h2>Dev Tools</h2>
-            <label class="checkbox">
-              <input id="toggle-debug" type="checkbox" />
-              Debug Overlay
-            </label>
-            <label class="checkbox">
-              <input id="toggle-perf" type="checkbox" checked />
-              Performance HUD
-            </label>
-          </section>
-          <section>
-            <h2>Objective</h2>
-            <p>Find the starforge core in each sector, defeat guardians, and escape.</p>
+          <section class="panel-section panel-section--dev">
+            <div class="panel-title"><h2>Developer display</h2><span class="section-index">03</span></div>
+            <label class="toggle-row"><span>Debug grid &amp; state</span><input id="toggle-debug" type="checkbox" /><span class="toggle-ui"></span></label>
+            <label class="toggle-row"><span>Performance readout</span><input id="toggle-perf" type="checkbox" checked /><span class="toggle-ui"></span></label>
           </section>
         </aside>
       </main>
-      <div id="overlay" class="overlay hidden">
+      <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
         <div class="overlay__panel">
+          <span class="eyebrow">STARFORGE ECHOES</span>
           <h2 id="overlay-title">Paused</h2>
           <p id="overlay-body"></p>
-          <button id="overlay-resume" class="btn">Resume</button>
+          <div class="overlay__actions"><button id="overlay-resume" class="btn btn--quiet" type="button">Resume</button><button id="overlay-restart" class="btn btn--quiet hidden" type="button">Restart run</button><button id="overlay-next" class="btn btn--accent hidden" type="button">Enter next sector</button></div>
         </div>
       </div>
       <div id="perf" class="perf"></div>
