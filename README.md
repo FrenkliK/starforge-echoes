@@ -24,7 +24,7 @@ The game runs locally in the browser. It has no runtime server or account requir
 
 ## Play online
 
-The site is configured for GitHub Pages at <https://frenklik.github.io/starforge-echoes/>. Once Pages is enabled for the repository, each push to `main` runs the tests, builds the site, and deploys the `dist` folder.
+The game is live on [GitHub Pages](https://frenklik.github.io/starforge-echoes/). Each push to `main` runs the tests, builds the site, and deploys the `dist` folder.
 
 ## Controls
 
